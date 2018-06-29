@@ -1,4 +1,4 @@
-(function() {
+(function () {
     SVG.extend(SVG.Element, {
         /**
          * draggy
@@ -15,10 +15,10 @@
         draggy: function (constraint) {
 
             var start
-              , drag
-              , end
-              , element = this
-              ;
+                , drag
+                , end
+                , element = this
+                ;
 
             // Remove draggable if already present
             if (typeof this.fixed === "function") {
@@ -29,7 +29,7 @@
             constraint = constraint || {};
 
             // Start dragging
-            start = function(event) {
+            start = function (event) {
                 var parent = this.parent(SVG.Nested) || this.parent(SVG.Doc);
                 event = event || window.event;
 
@@ -47,9 +47,9 @@
                 } else if (element instanceof SVG.Nested) {
                     box = {
                         x: element.x()
-                      , y: element.y()
-                      , width: element.width()
-                      , height: element.height()
+                        , y: element.y()
+                        , width: element.width()
+                        , height: element.height()
                     };
                 }
 
@@ -59,11 +59,11 @@
                 // Store start position
                 element.startPosition = {
                     x: box.x
-                  , y: box.y
-                  , width: box.width
-                  , height: box.height
-                  , zoom: parent.viewbox().zoom
-                  , rotation: element.transform("rotation") * Math.PI / 180
+                    , y: box.y
+                    , width: box.width
+                    , height: box.height
+                    , zoom: parent.viewbox().zoom
+                    , rotation: element.transform("rotation") * Math.PI / 180
                 };
 
                 // Add while and end events to window
@@ -77,9 +77,9 @@
                 element.node.dispatchEvent(new CustomEvent("dragstart", {
                     detail: {
                         event: event
-                      , delta: {
+                        , delta: {
                             x: 0
-                          , y: 0
+                            , y: 0
                         }
                     }
                 }));
@@ -100,40 +100,42 @@
                 var pz = elmZoom(p);
                 return {
                     x: t.scaleX * pz.x
-                  , y: t.scaleY * pz.y
+                    , y: t.scaleY * pz.y
                 };
             }
 
             // While dragging
-            drag = function(event) {
+            drag = function (event) {
                 event = event || window.event;
 
                 if (element.startEvent) {
                     // Calculate move position
                     var x
-                      , y
-                      , rotation = element.startPosition.rotation
-                      , width = element.startPosition.width
-                      , height = element.startPosition.height
-                      , zoom = element.startPosition.zoom
-                      , delta = {
+                        , y
+                        , rotation = element.startPosition.rotation
+                        , width = element.startPosition.width
+                        , height = element.startPosition.height
+                        , zoom = element.startPosition.zoom
+                        , delta = {
                             x: event.pageX - element.startEvent.pageX
-                          , y: event.pageY - element.startEvent.pageY
+                            , y: event.pageY - element.startEvent.pageY
                         }
-                      ;
+                        ;
 
                     if (/^touchstart|touchmove$/.test(event.type)) {
                         delta.x = event.touches[0].pageX - element.startEvent.touches[0].pageX;
                         delta.y = event.touches[0].pageY - element.startEvent.touches[0].pageY;
-                    } else if(/^click|mousedown|mousemove$/.test(event.type)) {
+                    } else if (/^click|mousedown|mousemove$/.test(event.type)) {
                         delta.x = event.pageX - element.startEvent.pageX;
                         delta.y = event.pageY - element.startEvent.pageY;
                     }
 
                     delta.scale = elmZoom(element);
 
-                    x = element.startPosition.x + (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation)) / Math.pow(delta.scale.x * zoom, 1);
-                    y = element.startPosition.y + (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / Math.pow(delta.scale.y * zoom, 1);
+                    documentZoom = (typeof element.doc().zoom == 'function') ? element.doc().zoom() : 1;
+
+                    x = element.startPosition.x + (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation)) / Math.pow(delta.scale.x * zoom, 1) / documentZoom;
+                    y = element.startPosition.y + (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / Math.pow(delta.scale.y * zoom, 1) / documentZoom;
 
                     // Move the element to its new position, if possible by constraint
                     if (typeof constraint === "function") {
@@ -183,21 +185,21 @@
                     element.node.dispatchEvent(new CustomEvent("dragmove", {
                         detail: {
                             delta: delta
-                          , event: event
+                            , event: event
                         }
                     }));
                 }
             };
 
             // When dragging ends
-            end = function(event) {
+            end = function (event) {
                 event = event || window.event;
 
                 // Calculate move position
                 var delta = {
                     x: event.pageX - element.startEvent.pageX
-                  , y: event.pageY - element.startEvent.pageY
-                  , zoom: element.startPosition.zoom
+                    , y: event.pageY - element.startEvent.pageY
+                    , zoom: element.startPosition.zoom
                 };
 
                 // Reset store
@@ -215,9 +217,9 @@
                     detail: {
                         delta: {
                             x: 0
-                          , y: 0
+                            , y: 0
                         }
-                      , event: event
+                        , event: event
                     }
                 }));
             };
@@ -227,7 +229,7 @@
             element.on("touchstart", start);
 
             // Disable draggable
-            element.fixed = function() {
+            element.fixed = function () {
                 element.off("mousedown", start);
                 element.off("touchstart", start);
 
