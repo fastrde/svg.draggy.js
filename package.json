@@ -198,5 +198,7 @@
       }
     ],
     "generate_license": false
-  }
+  },
+  "typings": "./svg.draggy.js.d.ts",
+  "dependencies": {}
 }
